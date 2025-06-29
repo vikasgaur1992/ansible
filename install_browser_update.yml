@@ -1,0 +1,28 @@
+---
+- name: Install Chrome and Firefox on Windows Server via MSI
+  hosts: windows
+  gather_facts: no
+  tasks:
+    - name: Download Chrome MSI
+      win_get_url:
+        url: "https://dl.google.com/chrome/install/latest/chrome_installer.msi"
+        dest: "C:\\Windows\\Temp\\chrome_installer.msi"
+
+    - name: Install Chrome
+      win_package:
+        path: "C:\\Windows\\Temp\\chrome_installer.msi"
+        product_name: "Google Chrome"
+        state: present
+        arguments: /qn
+
+    - name: Download Firefox MSI
+      win_get_url:
+        url: "https://download.mozilla.org/?product=firefox-latest&os=win64&lang=en-US"
+        dest: "C:\\Windows\\Temp\\firefox_installer.exe"
+
+    - name: Install Firefox
+      win_package:
+        path: "C:\\Windows\\Temp\\firefox_installer.exe"
+        product_name: "Mozilla Firefox"
+        state: present
+        arguments: /silent

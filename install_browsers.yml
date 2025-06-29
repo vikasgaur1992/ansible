@@ -1,0 +1,51 @@
+---
+- name: Install Chrome and Firefox from MSI on Windows Server
+  hosts: windows
+  gather_facts: no
+
+  tasks:
+
+    - name: Create temp folder for installers
+      win_file:
+        path: C:\Temp\Installers
+        state: directory
+
+    - name: Download Chrome MSI installer
+      win_get_url:
+        url: "https://dl.google.com/tag/s/appguid={8A69D345-D564-463C-AFF1-A69D9E530F96}&iid=&lang=en&browser=4&usagestats=0&appname=Google%20Chrome&needsadmin=true/dl/chrome/install/googlechromestandaloneenterprise64.msi"
+        dest: "C:\\Temp\\Installers\\chrome.msi"
+
+    - name: Download Firefox MSI installer
+      win_get_url:
+        url: "https://download.mozilla.org/?product=firefox-latest&os=win64&lang=en-US"
+        dest: "C:\\Temp\\Installers\\firefox.msi"
+
+    - name: Install Google Chrome
+      win_package:
+        path: "C:\\Temp\\Installers\\chrome.msi"
+        state: present
+        arguments: /quiet /norestart
+
+    - name: Install Mozilla Firefox
+      win_package:
+        path: "C:\\Temp\\Installers\\firefox.msi"
+        state: present
+        arguments: /quiet /norestart
+
+    - name: Confirm Chrome is installed
+      win_command: powershell -Command "Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -like '*Chrome*' }"
+      register: chrome_check
+      changed_when: false
+
+    - name: Output Chrome installation result
+      debug:
+        var: chrome_check.stdout
+
+    - name: Confirm Firefox is installed
+      win_command: powershell -Command "Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -like '*Firefox*' }"
+      register: firefox_check
+      changed_when: false
+
+    - name: Output Firefox installation result
+      debug:
+        var: firefox_check.stdout

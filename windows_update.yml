@@ -1,0 +1,19 @@
+---
+- name: Perform Windows Updates on Windows Server
+  hosts: windows
+  gather_facts: yes
+  tasks:
+
+    - name: Search and install all available updates
+      win_updates:
+        category_names:
+          - SecurityUpdates
+          - CriticalUpdates
+          - UpdateRollups
+          - Updates
+        reboot: yes
+      register: update_result
+
+    - name: Show update summary
+      debug:
+        var: update_result
